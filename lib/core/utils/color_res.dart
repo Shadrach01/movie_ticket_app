@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 class ColorRes {
   ColorRes._();
 
+  static const Color darkBlue = Color(0xff140C2C);
+
   static RadialGradient backgroundLinearColor = RadialGradient(
-    center: const Alignment(.8, .4),
+    center: const Alignment(.8, .5),
     colors: [
-      Color(0xff800080),
+      // Color(0xff800080),
+      Colors.purple.shade700,
       Color(0xff2E1371),
     ],
     radius: .9,
@@ -14,8 +17,8 @@ class ColorRes {
 
   static LinearGradient backgroundCircularGradientColor = const LinearGradient(
     colors: [
-      Color(0xFF66CDAA),
-      Color(0xFF008000), // Dark Green
+      Color(0xFF09FBD3),
+      Colors.transparent, // Dark Green
       // Medium Light Green (Fading Effect)
     ],
     begin: Alignment.topLeft,

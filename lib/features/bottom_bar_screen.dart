@@ -4,6 +4,7 @@ import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/dashboard/presentation/screen/dashboard_screen.dart';
 import 'package:iconly/iconly.dart';
+import 'package:movie_ticket/features/mobile_ticket_screen/screen/mobile_ticket_screen.dart';
 
 class BottomBarScreen extends StatefulWidget {
   const BottomBarScreen({super.key});
@@ -16,8 +17,9 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
   final List<Widget> screens = const [
     DashboardScreen(),
     Scaffold(backgroundColor: Colors.red),
+    MobileTicketScreen(),
+    // Scaffold(backgroundColor: Colors.grey),
     Scaffold(backgroundColor: Colors.blue),
-    Scaffold(backgroundColor: Colors.grey),
     Scaffold(backgroundColor: Colors.purple),
   ];
 
@@ -86,7 +88,6 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           ? AppCircularButton(
               height: appHeight * 0.08,
               width: appWidth * 0.2,
-              backgroundGradient: ColorRes.backgroundCircularGradientColor,
               color: Colors.purple.shade800,
               shadow: [
                 BoxShadow(
@@ -96,7 +97,6 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                   offset: Offset(0, 4),
                 ),
               ],
-              shape: BoxShape.circle,
               child: Icon(
                 icon,
                 color: Colors.white,
