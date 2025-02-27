@@ -23,6 +23,11 @@ dependencies:
   intl: ^0.20.2
   dots_indicator: ^4.0.1
   barcode_widget: ^2.0.4
+  flutter_riverpod: ^2.6.1
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.4
+  http: ^1.3.0
+  readmore: ^3.0.0
 
 
 

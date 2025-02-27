@@ -4,14 +4,19 @@ import 'package:movie_ticket/core/common/widgets/app_button.dart';
 import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/movie_details/presentation/widgets/curved_date_selector.dart';
+import 'package:readmore/readmore.dart';
+import '../../../dashboard/domain/entities/movie_entity.dart';
 
 class MovieDetailsScreenWidgets extends StatelessWidget {
-  const MovieDetailsScreenWidgets({super.key});
+  final MovieEntity movie;
+  const MovieDetailsScreenWidgets({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
+
+    final backdropUrl = 'https://image.tmdb.org/t/p/w500${movie.backdropPath}';
 
     return Stack(
       children: [
@@ -42,8 +47,8 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/sonic.jpg'),
-                  fit: BoxFit.fill,
+                  image: NetworkImage(backdropUrl),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -53,44 +58,67 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
         // SafeArea for UI elements on top
         SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: appWidth * .03),
+            padding: EdgeInsets.only(
+              left: appWidth * .04,
+              right: appWidth * .04,
+              top: appHeight * .007,
+              bottom: appHeight * .04,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: <Widget>[
                 _appBar(appHeight, appWidth, context),
-                SizedBox(height: appHeight * 0.25),
-                Text(
-                  "Sonic the HedgeHog",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                SizedBox(height: appHeight * 0.2),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          movie.title,
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: appHeight * .03),
+                        ReadMoreText(
+                          movie.overview,
+                          trimLines: 3,
+                          trimMode: TrimMode.Line,
+                          moreStyle: TextStyle(
+                            fontSize: appWidth * .04,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          lessStyle: TextStyle(
+                            fontSize: appWidth * .04,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          style: TextStyle(
+                            fontSize: appWidth * .05,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                        SizedBox(height: appHeight * .02),
+                        Text(
+                          "Select date and time",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: appWidth * .05,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox.shrink(),
+                        CurvedDateSelector(),
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(height: appHeight * .03),
-                Text(
-                  "Sonic was refuksdc kiicoi lohcldshcluh ldhcljsdjkvc ldhjsv,jshvluh jdc"
-                  " jdlhshdf,jkhlcvh jdnv cs knlvjs nf"
-                  "c ldjhvlsjdfhjkh",
-                  style: TextStyle(
-                    fontSize: appWidth * .05,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.justify,
-                ),
-                SizedBox(height: appHeight * .02),
-                Text(
-                  "Select date and time",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: appWidth * .05,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox.shrink(),
-                CurvedDateSelector(),
               ],
             ),
           ),

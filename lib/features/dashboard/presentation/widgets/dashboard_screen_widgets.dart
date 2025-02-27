@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_ticket/core/common/widgets/app_text_fields.dart';
 import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
-import 'package:movie_ticket/features/dashboard/presentation/widgets/now_playing_widget.dart';
+import 'package:movie_ticket/features/dashboard/domain/entities/movie_entity.dart';
+import 'package:movie_ticket/features/dashboard/presentation/widgets/movie_card.dart';
+import 'package:movie_ticket/features/dashboard/provider_and_state/dasboard_notifier.dart';
 
-class DashboardScreenWidgets extends StatelessWidget {
+class DashboardScreenWidgets extends ConsumerWidget {
   const DashboardScreenWidgets({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+    final upComingMovies = ref.watch(upComingMoviesProvider);
+    final topRatedMovies = ref.watch(topRatedMoviesProvider);
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
     return Container(
@@ -24,9 +30,9 @@ class DashboardScreenWidgets extends StatelessWidget {
         children: [
           appBar(appHeight),
           searchField(appHeight),
-          nowPlaying(appHeight, appWidth),
-          comingSoon(appHeight, appWidth),
-          topMovies(appHeight, appWidth),
+          nowPlaying(appHeight, appWidth, nowPlayingMovies),
+          comingSoon(appHeight, appWidth, upComingMovies),
+          topMovies(appHeight, appWidth, topRatedMovies),
         ],
       ),
     );
@@ -66,10 +72,36 @@ class DashboardScreenWidgets extends StatelessWidget {
     );
   }
 
+  Widget _buildMovieList(
+    double appWidth,
+    double appHeight,
+    AsyncValue<List<MovieEntity>> moviesProvider,
+  ) {
+    return moviesProvider.when(
+      data: (movies) {
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: movies.length,
+          itemBuilder: (context, index) {
+            final movie = movies[index];
+            return MovieCard(movie: movie);
+          },
+        );
+      },
+      error: (error, stackTrace) => Center(
+        child: Text('Error: ${error.toString()}'),
+      ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
   // Now playing section
   Widget nowPlaying(
     double appHeight,
     double appWidth,
+    AsyncValue<List<MovieEntity>> moviesProvider,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,7 +117,7 @@ class DashboardScreenWidgets extends StatelessWidget {
         ),
         SizedBox(
           height: appHeight * .165,
-          child: NowPlayingWidget(),
+          child: _buildMovieList(appWidth, appHeight, moviesProvider),
         ),
       ],
     );
@@ -95,6 +127,7 @@ class DashboardScreenWidgets extends StatelessWidget {
   Widget comingSoon(
     double appHeight,
     double appWidth,
+    AsyncValue<List<MovieEntity>> moviesProvider,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +143,7 @@ class DashboardScreenWidgets extends StatelessWidget {
         ),
         SizedBox(
           height: appHeight * .165,
-          child: NowPlayingWidget(),
+          child: _buildMovieList(appWidth, appHeight, moviesProvider),
         ),
       ],
     );
@@ -120,6 +153,7 @@ class DashboardScreenWidgets extends StatelessWidget {
   Widget topMovies(
     double appHeight,
     double appWidth,
+    AsyncValue<List<MovieEntity>> moviesProvider,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +169,7 @@ class DashboardScreenWidgets extends StatelessWidget {
         ),
         SizedBox(
           height: appHeight * .165,
-          child: NowPlayingWidget(),
+          child: _buildMovieList(appWidth, appHeight, moviesProvider),
         ),
       ],
     );
