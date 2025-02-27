@@ -5,7 +5,7 @@ import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/dashboard/domain/entities/movie_entity.dart';
 import 'package:movie_ticket/features/dashboard/presentation/widgets/movie_card.dart';
-import 'package:movie_ticket/features/dashboard/provider_and_state/dasboard_notifier.dart';
+import 'package:movie_ticket/features/dashboard/provider_and_state/providers.dart';
 
 class DashboardScreenWidgets extends ConsumerWidget {
   const DashboardScreenWidgets({super.key});
@@ -15,6 +15,7 @@ class DashboardScreenWidgets extends ConsumerWidget {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final upComingMovies = ref.watch(upComingMoviesProvider);
     final topRatedMovies = ref.watch(topRatedMoviesProvider);
+
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
     return Container(
