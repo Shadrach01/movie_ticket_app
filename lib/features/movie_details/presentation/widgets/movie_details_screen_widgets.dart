@@ -3,9 +3,11 @@ import 'package:iconly/iconly.dart';
 import 'package:movie_ticket/core/common/widgets/app_button.dart';
 import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
+import 'package:movie_ticket/features/choose_seats/presentation/screen/choose_seats.dart';
 import 'package:movie_ticket/features/movie_details/presentation/widgets/curved_date_selector.dart';
 import 'package:readmore/readmore.dart';
 import '../../../dashboard/domain/entities/movie_entity.dart';
+import 'curved_time_selector.dart';
 
 class MovieDetailsScreenWidgets extends StatelessWidget {
   final MovieEntity movie;
@@ -59,17 +61,17 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
         SafeArea(
           child: Padding(
             padding: EdgeInsets.only(
-              left: appWidth * .04,
-              right: appWidth * .04,
+              left: appWidth * .02,
+              right: appWidth * .02,
               top: appHeight * .007,
-              bottom: appHeight * .04,
+              bottom: appHeight * .02,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _appBar(appHeight, appWidth, context),
-                SizedBox(height: appHeight * 0.2),
+                SizedBox(height: appHeight * 0.19),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
@@ -82,20 +84,20 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: appHeight * .03),
+                        SizedBox(height: appHeight * .02),
                         ReadMoreText(
                           movie.overview,
                           trimLines: 3,
                           trimMode: TrimMode.Line,
                           moreStyle: TextStyle(
-                            fontSize: appWidth * .04,
-                            color: Colors.grey.shade500,
+                            fontSize: appWidth * .05,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                           lessStyle: TextStyle(
-                            fontSize: appWidth * .04,
-                            color: Colors.grey.shade500,
+                            fontSize: appWidth * .05,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                           style: TextStyle(
                             fontSize: appWidth * .05,
@@ -113,8 +115,24 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox.shrink(),
-                        CurvedDateSelector(),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: appHeight *
+                                  0.02), // Space between label and date selector
+                          child: CurvedDateSelector(),
+                        ),
+                        Transform.translate(
+                          offset: Offset(0, -appHeight * .15),
+                          child: CurvedTimeSelector(),
+                        ),
+                        Transform.translate(
+                          offset: Offset(0, -appHeight * .2),
+                          child: _reservationButton(
+                            appHeight,
+                            appWidth,
+                            context,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -160,6 +178,40 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _reservationButton(
+      double appHeight, double appWidth, BuildContext context) {
+    return AppRectangularButton(
+      height: appHeight * .082,
+      width: appWidth * .92,
+      borderRadius: 20,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChooseSeats(),
+          ),
+        );
+      },
+      foregroundColor: LinearGradient(
+        colors: [
+          Color(0xFFB6116B),
+          Color(0xFF2E1371),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomCenter,
+        stops: [.09, .9],
+      ),
+      child: Text(
+        "Reservation",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: appWidth * .06,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

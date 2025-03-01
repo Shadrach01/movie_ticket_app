@@ -5,24 +5,29 @@ import 'package:movie_ticket/core/utils/screen_size.dart';
 
 import '../../../../core/common/widgets/app_button.dart';
 
-class CurvedDateSelector extends StatefulWidget {
-  const CurvedDateSelector({
+class CurvedTimeSelector extends StatefulWidget {
+  const CurvedTimeSelector({
     super.key,
   });
 
   @override
-  State<CurvedDateSelector> createState() => _CurvedDateSelectorState();
+  State<CurvedTimeSelector> createState() => _CurvedTimeSelectorState();
 }
 
-class _CurvedDateSelectorState extends State<CurvedDateSelector> {
+class _CurvedTimeSelectorState extends State<CurvedTimeSelector> {
   late ScrollController _scrollController;
   late int centerIndex;
   late PageController _pageController;
 
+  final List<DateTime> _timeSlots = List.generate(
+    24,
+    (index) => DateTime(2024, 1, 1, index, 0),
+  );
+
   @override
   void initState() {
     super.initState();
-    centerIndex = 2;
+    centerIndex = DateTime.now().hour;
     _pageController = PageController(
       viewportFraction: 0.19,
       initialPage: centerIndex,
@@ -41,14 +46,9 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
   Widget build(BuildContext context) {
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
-    final currentDate = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(
-      currentDate.year,
-      currentDate.month,
-    );
 
     return SizedBox(
-      height: appHeight * 0.3,
+      height: appHeight * 0.25,
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification is ScrollUpdateNotification) {
@@ -61,57 +61,52 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
         child: Container(
           padding: EdgeInsets.symmetric(
             vertical: appHeight * 0.025,
-            // horizontal: appWidth * 0.02,
           ),
           child: PageView.builder(
             controller: _pageController,
-            itemCount: daysInMonth,
+            itemCount: _timeSlots.length,
             onPageChanged: (index) {
               setState(() {
                 centerIndex = index;
               });
             },
             itemBuilder: (context, index) {
-              final date = DateTime(
-                currentDate.year,
-                currentDate.month,
-                index + 1,
-              );
+              final time = _timeSlots[index];
 
               final relativeIndex = index - centerIndex;
               final isCenter = index == centerIndex;
 
               // Reduced curve calculation parameters
-              double verticalOffset;
+              double horizontalOffset;
               if (isCenter) {
-                verticalOffset = 2; // Reduced center height
+                horizontalOffset = 6; // Reduced center height
               } else {
                 // Gentler parabolic curve
                 final curveIntensity =
-                    pow(relativeIndex.abs() * 0.8, 1.1); // Reduced multiplier
-                verticalOffset = curveIntensity *
+                    pow(relativeIndex.abs() * 0.67, 1.0); // Reduced multiplier
+                horizontalOffset = curveIntensity *
                     appHeight *
                     0.055; // Reduced height multiplier
 
                 // Reduced sine wave component
                 final sineComponent =
-                    sin(relativeIndex.abs() * pi / 2) * appHeight * 0.02;
-                verticalOffset += sineComponent;
+                    sin(relativeIndex.abs() * pi / 2) * appWidth * 0.02;
+                horizontalOffset += sineComponent;
               }
 
               // Reduced horizontal offset
-              final horizontalOffset = relativeIndex.abs() > 0
-                  ? (relativeIndex / relativeIndex.abs()) * appWidth * 0.02
+              final verticalOffset = relativeIndex.abs() > 0
+                  ? (relativeIndex / relativeIndex.abs()) * appHeight * 0.01
                   : 0.0;
 
               return Transform.translate(
-                offset: Offset(horizontalOffset, verticalOffset),
+                offset: Offset(verticalOffset, horizontalOffset),
                 child: Opacity(
                   opacity: 1.0 -
                       (relativeIndex.abs() * 0.2)
                           .clamp(0.0, 0.9), // Adjusted opacity fade
-                  child: _dateButton(
-                    date,
+                  child: _timeButton(
+                    time,
                     appHeight,
                     appWidth,
                     isSelected: isCenter,
@@ -125,16 +120,15 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
     );
   }
 
-  Widget _dateButton(
-    DateTime date,
+  Widget _timeButton(
+    DateTime time,
     double appHeight,
     double appWidth, {
     bool isSelected = false,
   }) {
     return AppRectangularButton(
-      height: isSelected ? appHeight * .13 : appHeight * .09,
-      width: isSelected ? appWidth * .17 : appWidth * .135,
-      // width: isSelected ? appWidth * .17 : appWidth * .14,
+      height: isSelected ? appHeight * .065 : appHeight * .055,
+      width: isSelected ? appWidth * .17 : appWidth * .15,
       foregroundColor: LinearGradient(
         colors: isSelected
             ? [
@@ -147,29 +141,15 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
               ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        stops: isSelected ? [0.3, .9] : [0.3, .86],
+        stops: isSelected ? [0.3, .94] : [0.3, .86],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            DateFormat('EEE').format(date),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: appWidth * .05,
-              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w400,
-            ),
-          ),
-          Text(
-            "${date.day}",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: appWidth * .06,
-              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w400,
-            ),
-          ),
-        ],
+      child: Text(
+        DateFormat('HH:mm').format(time),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: isSelected ? appWidth * .05 : appWidth * .04,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
     );
   }
