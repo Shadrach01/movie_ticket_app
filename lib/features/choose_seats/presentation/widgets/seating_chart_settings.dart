@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
+import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_provider.dart';
 
 enum SeatStatus { available, reserved, selected }
 
@@ -9,17 +11,18 @@ class SeatData {
   SeatData(this.status);
 }
 
-class SeatingChartSettings extends StatefulWidget {
+class SeatingChartSettings extends ConsumerStatefulWidget {
   const SeatingChartSettings({super.key});
 
   @override
-  State<SeatingChartSettings> createState() => _SeatingChartSettingsState();
+  ConsumerState<SeatingChartSettings> createState() =>
+      _SeatingChartSettingsState();
 }
 
-class _SeatingChartSettingsState extends State<SeatingChartSettings> {
+class _SeatingChartSettingsState extends ConsumerState<SeatingChartSettings> {
   //List of rows, each containing a list of seat data
   final List<List<SeatData>> _seatingRows = [];
-  SeatData? _selectedSeat;
+
   int _selectedRowIndex = -1;
   int _selectedSeatIndex = -1;
 
@@ -120,7 +123,11 @@ class _SeatingChartSettingsState extends State<SeatingChartSettings> {
     ]);
   }
 
-  void _selectSeat(int rowIndex, int seatIndex) {
+  void _selectSeat(
+    int rowIndex,
+    int seatIndex,
+    WidgetRef ref,
+  ) {
     final seat = _seatingRows[rowIndex][seatIndex];
 
     if (seat.status == SeatStatus.reserved) {
@@ -130,13 +137,60 @@ class _SeatingChartSettingsState extends State<SeatingChartSettings> {
       if (seat.status == SeatStatus.available) {
         // Change available seat to selected
         seat.status = SeatStatus.selected;
+
+        // int seatRow = rowIndex;
+
+        List<int> seatRow = ref.read(ticketDetailsProvider).seatRow.toList();
+
+        if (!seatRow.contains(rowIndex + 1)) {
+          seatRow.add(rowIndex + 1);
+          ref.read(ticketDetailsProvider.notifier).movieSeatRow(seatRow);
+        }
+
+        // Get the current seat numbers
+        List<int> currentSelectedSeats =
+            ref.read(ticketDetailsProvider).seatNumbers.toList();
+
+        // Add new seat number
+        currentSelectedSeats.add(seatIndex + 1);
+        ref
+            .read(ticketDetailsProvider.notifier)
+            .movieSeatNumbers(currentSelectedSeats);
       } else if (seat.status == SeatStatus.selected) {
         // Toggle back to available
         seat.status = SeatStatus.available;
+
+        // Remove the seat row
+        List<int> seatRow = ref.read(ticketDetailsProvider).seatRow.toList();
+
+        // Check if any seats remain in this category
+        bool hasRemainingSeatsInRow = _seatingRows[rowIndex]
+            .any((seat) => seat.status == SeatStatus.selected);
+
+        if (!hasRemainingSeatsInRow) {
+          seatRow.remove(rowIndex + 1);
+        }
+
+        // // Update providers
+        // if (seatRow.isNotEmpty) {
+        //   ref.read(ticketDetailsProvider.notifier).movieSeatRow(seatRow);
+        // }
+        // Remove the seat number
+        List<int> currentSelectedSeats =
+            ref.read(ticketDetailsProvider).seatNumbers.toList();
+
+        currentSelectedSeats.remove(seatIndex + 1);
+
+        if (seatRow.isNotEmpty) {
+          ref.read(ticketDetailsProvider.notifier).movieSeatRow(seatRow);
+        }
+
+        ref
+            .read(ticketDetailsProvider.notifier)
+            .movieSeatNumbers(currentSelectedSeats);
       }
       _selectedRowIndex = rowIndex;
       _selectedSeatIndex = seatIndex;
-      _selectedSeat = _seatingRows[rowIndex][seatIndex];
     });
   }
 
@@ -160,7 +214,7 @@ class _SeatingChartSettingsState extends State<SeatingChartSettings> {
                   return GestureDetector(
                     onTap: () {
                       if (seat.status != SeatStatus.reserved) {
-                        _selectSeat(rowIndex, seatIndex);
+                        _selectSeat(rowIndex, seatIndex, ref);
                       }
                     },
                     child: SeatWidget(
@@ -273,9 +327,6 @@ class SeatWidget extends StatelessWidget {
           topLeft: Radius.circular(5),
           topRight: Radius.circular(5),
         ),
-        border: isSelected
-            ? Border.all(color: Colors.yellow, width: 2)
-            : Border.all(color: Colors.black26),
       ),
       child: Center(
         child: Text(

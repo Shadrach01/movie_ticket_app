@@ -6,8 +6,12 @@ import 'package:movie_ticket/core/utils/screen_size.dart';
 import '../../../../core/common/widgets/app_button.dart';
 
 class CurvedTimeSelector extends StatefulWidget {
+  final DateTime time;
+  final Function(DateTime) onTimeSelected;
   const CurvedTimeSelector({
     super.key,
+    required this.time,
+    required this.onTimeSelected,
   });
 
   @override
@@ -54,6 +58,11 @@ class _CurvedTimeSelectorState extends State<CurvedTimeSelector> {
           if (notification is ScrollUpdateNotification) {
             setState(() {
               centerIndex = _pageController.page!.round();
+
+              // Get the selected time and pass it to the parent
+
+              final selectedTime = _timeSlots[centerIndex];
+              widget.onTimeSelected(selectedTime);
             });
           }
           return true;
@@ -68,6 +77,10 @@ class _CurvedTimeSelectorState extends State<CurvedTimeSelector> {
             onPageChanged: (index) {
               setState(() {
                 centerIndex = index;
+
+                // Also update the selected time when page changes
+                final selectedTime = _timeSlots[index];
+                widget.onTimeSelected(selectedTime);
               });
             },
             itemBuilder: (context, index) {

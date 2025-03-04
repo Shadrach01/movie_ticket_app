@@ -6,8 +6,12 @@ import 'package:movie_ticket/core/utils/screen_size.dart';
 import '../../../../core/common/widgets/app_button.dart';
 
 class CurvedDateSelector extends StatefulWidget {
+  final DateTime date;
+  final Function(DateTime) onDateSelected;
   const CurvedDateSelector({
     super.key,
+    required this.date,
+    required this.onDateSelected,
   });
 
   @override
@@ -41,10 +45,10 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
   Widget build(BuildContext context) {
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
-    final currentDate = DateTime.now();
+
     final daysInMonth = DateUtils.getDaysInMonth(
-      currentDate.year,
-      currentDate.month,
+      widget.date.year,
+      widget.date.month,
     );
 
     return SizedBox(
@@ -54,6 +58,15 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
           if (notification is ScrollUpdateNotification) {
             setState(() {
               centerIndex = _pageController.page!.round();
+
+              // Get the selected date and pass it to the parent
+
+              final selectedDate = DateTime(
+                widget.date.year,
+                widget.date.month,
+                centerIndex + 1,
+              );
+              widget.onDateSelected(selectedDate);
             });
           }
           return true;
@@ -73,8 +86,8 @@ class _CurvedDateSelectorState extends State<CurvedDateSelector> {
             },
             itemBuilder: (context, index) {
               final date = DateTime(
-                currentDate.year,
-                currentDate.month,
+                widget.date.year,
+                widget.date.month,
                 index + 1,
               );
 

@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:movie_ticket/core/common/widgets/app_button.dart';
 import 'package:movie_ticket/core/utils/color_res.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/choose_seats/presentation/screen/choose_seats.dart';
 import 'package:movie_ticket/features/movie_details/presentation/widgets/curved_date_selector.dart';
+import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_provider.dart';
 import 'package:readmore/readmore.dart';
 import '../../../dashboard/domain/entities/movie_entity.dart';
 import 'curved_time_selector.dart';
 
-class MovieDetailsScreenWidgets extends StatelessWidget {
+class MovieDetailsScreenWidgets extends ConsumerWidget {
   final MovieEntity movie;
   const MovieDetailsScreenWidgets({super.key, required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
 
     final backdropUrl = 'https://image.tmdb.org/t/p/w500${movie.backdropPath}';
+
+    final initialDate = DateTime.now();
 
     return Stack(
       children: [
@@ -119,11 +124,32 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
                           margin: EdgeInsets.only(
                               bottom: appHeight *
                                   0.02), // Space between label and date selector
-                          child: CurvedDateSelector(),
+                          child: CurvedDateSelector(
+                            date: initialDate,
+                            onDateSelected: (date) {
+                              // Format to show only date
+                              final formattedDate =
+                                  DateFormat('MMMM d, y').format(date);
+                              // update the selected date when changed
+                              ref
+                                  .read(ticketDetailsProvider.notifier)
+                                  .movieDate(formattedDate);
+                            },
+                          ),
                         ),
                         Transform.translate(
                           offset: Offset(0, -appHeight * .15),
-                          child: CurvedTimeSelector(),
+                          child: CurvedTimeSelector(
+                            time: initialDate,
+                            onTimeSelected: (time) {
+                              final formattedTime =
+                                  DateFormat('hh:mm a').format(time);
+
+                              ref
+                                  .read(ticketDetailsProvider.notifier)
+                                  .movieTime(formattedTime);
+                            },
+                          ),
                         ),
                         Transform.translate(
                           offset: Offset(0, -appHeight * .2),
@@ -131,6 +157,18 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
                             appHeight,
                             appWidth,
                             context,
+                            onTap: () {
+                              ref
+                                  .read(ticketDetailsProvider.notifier)
+                                  .movieName(movie.title);
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChooseSeats(),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -182,19 +220,16 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
   }
 
   Widget _reservationButton(
-      double appHeight, double appWidth, BuildContext context) {
+    double appHeight,
+    double appWidth,
+    BuildContext context, {
+    required void Function() onTap,
+  }) {
     return AppRectangularButton(
       height: appHeight * .082,
       width: appWidth * .92,
       borderRadius: 20,
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChooseSeats(),
-          ),
-        );
-      },
+      onTap: onTap,
       foregroundColor: LinearGradient(
         colors: [
           Color(0xFFB6116B),

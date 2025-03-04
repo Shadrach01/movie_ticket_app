@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconly/iconly.dart';
 import 'package:movie_ticket/core/common/widgets/app_button.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/mobile_ticket_screen/screen/mobile_ticket_screen.dart';
+import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_provider.dart';
 
 import '../../../../core/utils/color_res.dart';
 
-class DateTimeAndBuyButtonContainer extends StatelessWidget {
+class DateTimeAndBuyButtonContainer extends ConsumerWidget {
   const DateTimeAndBuyButtonContainer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(ticketDetailsProvider);
+
     final height = context.appHeight;
     final width = context.appWidth;
     return Container(
@@ -28,39 +32,45 @@ class DateTimeAndBuyButtonContainer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: EdgeInsets.only(
-                  left: width * .07,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _dateDetails(
-                      height,
-                      width,
-                      IconlyBold.calendar,
-                      "April 23, 2022",
-                      "6 p.m.",
-                    ),
-                    SizedBox(height: height * .02),
-                    _dateDetails(
-                      height,
-                      width,
-                      IconlyBold.ticket,
-                      "VIP Section",
-                      "Seat 9,10",
-                    ),
-                    SizedBox(height: height * .02),
-                    _dateDetails(
-                      height,
-                      width,
-                      IconlyBold.buy,
-                      "Total: \$30",
-                      "",
-                      dotRequired: false,
-                    ),
-                  ],
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: width * .07,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _dateDetails(
+                        height,
+                        width,
+                        IconlyBold.calendar,
+                        state.date,
+                        state.time,
+                      ),
+                      SizedBox(height: height * .02),
+                      _dateDetails(
+                        height,
+                        width,
+                        IconlyBold.ticket,
+                        state.seatRow.isNotEmpty
+                            ? "Row ${state.seatRow.join(',')}"
+                            : "Select seat",
+                        state.seatNumbers.isNotEmpty
+                            ? "Seat ${state.seatNumbers.join(',')}"
+                            : "Select seat",
+                      ),
+                      SizedBox(height: height * .02),
+                      _dateDetails(
+                        height,
+                        width,
+                        IconlyBold.buy,
+                        "Total: \$30",
+                        "",
+                        dotRequired: false,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               _buyButton(height, width, context),
