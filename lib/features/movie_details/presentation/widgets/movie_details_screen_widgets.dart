@@ -71,7 +71,7 @@ class MovieDetailsScreenWidgets extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _appBar(appHeight, appWidth, context),
-                SizedBox(height: appHeight * 0.19),
+                SizedBox(height: appHeight * 0.15),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
