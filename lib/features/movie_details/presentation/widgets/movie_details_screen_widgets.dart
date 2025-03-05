@@ -22,6 +22,7 @@ class MovieDetailsScreenWidgets extends ConsumerWidget {
     final appWidth = context.appWidth;
 
     final backdropUrl = 'https://image.tmdb.org/t/p/w500${movie.backdropPath}';
+    final posterUrl = 'https://image.tmdb.org/t/p/w200${movie.posterPath}';
 
     final initialDate = DateTime.now();
 
@@ -161,6 +162,10 @@ class MovieDetailsScreenWidgets extends ConsumerWidget {
                               ref
                                   .read(ticketDetailsProvider.notifier)
                                   .movieName(movie.title);
+
+                              ref
+                                  .read(ticketDetailsProvider.notifier)
+                                  .moviePicture(posterUrl);
 
                               Navigator.push(
                                 context,

@@ -1,18 +1,27 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconly/iconly.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/bottom_bar_screen.dart';
 import 'package:movie_ticket/features/mobile_ticket_screen/widgets/ticket_details.dart';
+import 'package:movie_ticket/features/mobile_ticket_screen/widgets/ticket_widget.dart';
+import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_provider.dart';
 
 import '../../../core/common/widgets/app_button.dart';
 import '../../../core/utils/color_res.dart';
+import 'infinite_dragable_slider.dart';
 
-class MobileTicketsScreenWidgets extends StatelessWidget {
+class MobileTicketsScreenWidgets extends ConsumerWidget {
   const MobileTicketsScreenWidgets({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Get the state
+    final state = ref.watch(ticketDetailsProvider);
+
+    final tickets = state.bookedTickets;
+
     final appHeight = context.appHeight;
     final appWidth = context.appWidth;
     return Container(
@@ -40,9 +49,24 @@ class MobileTicketsScreenWidgets extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            TicketDetails(),
+            // TicketDetails(),
+            tickets.isNotEmpty
+                ? Expanded(
+                    child: InfiniteDraggableSlider(
+                      itemCount: tickets.length,
+                      itemBuilder: (BuildContext context, int index) =>
+                          TicketWidget(ticket: tickets[index]),
+                    ),
+                  )
+                : Text(
+                    "Not ticket has been booked yet",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
             DotsIndicator(
-              dotsCount: 3,
+              dotsCount: state.bookedTickets.length,
               decorator: DotsDecorator(
                 activeColor: Colors.deepPurple,
                 color: Colors.purple.withOpacity(.3),

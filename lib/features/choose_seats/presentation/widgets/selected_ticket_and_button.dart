@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconly/iconly.dart';
 import 'package:movie_ticket/core/common/widgets/app_button.dart';
+import 'package:movie_ticket/core/models/ticket_details_model.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 import 'package:movie_ticket/features/mobile_ticket_screen/screen/mobile_ticket_screen.dart';
 import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_provider.dart';
@@ -45,8 +48,8 @@ class DateTimeAndBuyButtonContainer extends ConsumerWidget {
                         height,
                         width,
                         IconlyBold.calendar,
-                        state.date,
-                        state.time,
+                        state.date.isEmpty ? "Select date" : state.date,
+                        state.time.isEmpty ? "Select time" : state.time,
                       ),
                       SizedBox(height: height * .02),
                       _dateDetails(
@@ -73,7 +76,7 @@ class DateTimeAndBuyButtonContainer extends ConsumerWidget {
                   ),
                 ),
               ),
-              _buyButton(height, width, context),
+              _buyButton(height, width, context, ref),
             ],
           ),
         ],
@@ -81,7 +84,12 @@ class DateTimeAndBuyButtonContainer extends ConsumerWidget {
     );
   }
 
-  Widget _buyButton(double height, double width, BuildContext context) {
+  Widget _buyButton(
+    double height,
+    double width,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return Container(
       height: height * .12,
       width: width * .28,
@@ -97,12 +105,37 @@ class DateTimeAndBuyButtonContainer extends ConsumerWidget {
             height: height * .09,
             width: width * .18,
             color: Colors.purple.shade700,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MobileTicketScreen(),
-              ),
-            ),
+            onTap: () {
+              // Get the current state details
+              final currentState = ref.read(ticketDetailsProvider);
+
+              // Create a new TicketModel with current state details
+              final newTicket = TicketModel(
+                name: currentState.name,
+                picture: currentState.picture,
+                date: currentState.date,
+                time: currentState.time,
+                seatNumber: currentState.seatNumbers,
+                seatRow: currentState.seatRow,
+              );
+
+              // Get the current booked tickets
+              List<TicketModel> updatedBookedTickets = [
+                ...currentState.bookedTickets,
+                newTicket
+              ];
+
+              // Update booked tickets in the state
+              ref
+                  .read(ticketDetailsProvider.notifier)
+                  .bookTicket(updatedBookedTickets);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MobileTicketScreen(),
+                ),
+              );
+            },
             child: Text(
               "Buy",
               style: TextStyle(

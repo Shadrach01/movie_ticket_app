@@ -1,12 +1,12 @@
-class TicketDetailsModel {
+class TicketModel {
   final String name;
   final String picture;
   final String date;
   final String time;
   final List<int> seatNumber;
-  final int seatRow;
+  final List<int> seatRow;
 
-  const TicketDetailsModel({
+  const TicketModel({
     required this.name,
     required this.picture,
     required this.date,

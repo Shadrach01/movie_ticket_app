@@ -3,9 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:movie_ticket/core/common/widgets/draggable_widget.dart';
-import 'package:movie_ticket/core/utils/screen_size.dart';
-
-import '../../../core/common/widgets/app_button.dart';
 
 class InfiniteDraggableSlider extends StatefulWidget {
   const InfiniteDraggableSlider({
@@ -99,30 +96,31 @@ class _InfiniteDraggableSliderState extends State<InfiniteDraggableSlider>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          return Stack(
-            children: List.generate(
-              4,
-              (stackIndex) {
-                final modIndex = (index + 3 - stackIndex) % widget.itemCount;
-                return Transform.translate(
-                  offset: getOffset(stackIndex),
-                  child: Transform.scale(
-                    scale: getScale(stackIndex),
-                    child: Transform.rotate(
-                      angle: getAngle(stackIndex),
-                      child: DraggableWidget(
-                        onSlideOut: onSlideOut,
-                        isEnabledDrag: stackIndex == 3,
-                        child: widget.itemBuilder(context, modIndex),
-                      ),
+      animation: controller,
+      builder: (context, _) {
+        return Stack(
+          children: List.generate(
+            4,
+            (stackIndex) {
+              final modIndex = (index + 3 - stackIndex) % widget.itemCount;
+              return Transform.translate(
+                offset: getOffset(stackIndex),
+                child: Transform.scale(
+                  scale: getScale(stackIndex),
+                  child: Transform.rotate(
+                    angle: getAngle(stackIndex),
+                    child: DraggableWidget(
+                      onSlideOut: onSlideOut,
+                      isEnabledDrag: stackIndex == 3,
+                      child: widget.itemBuilder(context, modIndex),
                     ),
                   ),
-                );
-              },
-            ),
-          );
-        });
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 }

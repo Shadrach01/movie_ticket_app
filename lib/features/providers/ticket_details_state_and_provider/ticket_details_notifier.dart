@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_ticket/core/models/ticket_details_model.dart';
 import 'package:movie_ticket/features/providers/ticket_details_state_and_provider/ticket_details_state.dart';
 
 class TicketDetailsNotifier extends StateNotifier<TicketDetailsState> {
@@ -34,5 +35,11 @@ class TicketDetailsNotifier extends StateNotifier<TicketDetailsState> {
   void movieSeatRow(List<int> seatRow) {
     log("Movie seat row: $seatRow");
     state = state.copyWith(seatRow: seatRow);
+  }
+
+  void bookTicket(List<TicketModel> bookedTickets) {
+    log("Booked ticket list: $bookedTickets");
+
+    state = state.copyWith(bookedTickets: bookedTickets);
   }
 }

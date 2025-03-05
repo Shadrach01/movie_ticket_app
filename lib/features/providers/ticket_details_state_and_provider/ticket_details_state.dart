@@ -1,3 +1,5 @@
+import 'package:movie_ticket/core/models/ticket_details_model.dart';
+
 class TicketDetailsState {
   final String name;
   final String picture;
@@ -6,6 +8,8 @@ class TicketDetailsState {
   final List<int> seatNumbers;
   final List<int> seatRow;
 
+  final List<TicketModel> bookedTickets;
+
   TicketDetailsState({
     this.name = '',
     this.picture = '',
@@ -13,16 +17,19 @@ class TicketDetailsState {
     this.time = '',
     List<int>? seatNumbers,
     List<int>? seatRow,
+    List<TicketModel>? bookedTickets,
   })  : seatNumbers = seatNumbers ?? [],
-        seatRow = seatRow ?? [];
+        seatRow = seatRow ?? [],
+        bookedTickets = bookedTickets ?? [];
 
   TicketDetailsState copyWith({
     String? name,
     String? picture,
-    dynamic date,
-    dynamic time,
+    String? date,
+    String? time,
     List<int>? seatNumbers,
     List<int>? seatRow,
+    List<TicketModel>? bookedTickets,
   }) {
     return TicketDetailsState(
       name: name ?? this.name,
@@ -31,6 +38,7 @@ class TicketDetailsState {
       time: time ?? this.time,
       seatNumbers: seatNumbers ?? this.seatNumbers,
       seatRow: seatRow ?? this.seatRow,
+      bookedTickets: bookedTickets ?? this.bookedTickets,
     );
   }
 }

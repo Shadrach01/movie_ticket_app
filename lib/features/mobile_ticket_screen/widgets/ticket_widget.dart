@@ -1,11 +1,16 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_ticket/core/models/ticket_details_model.dart';
 import 'package:movie_ticket/core/utils/screen_size.dart';
 
 import '../../../core/common/widgets/app_button.dart';
 
 class TicketWidget extends StatelessWidget {
-  const TicketWidget({super.key});
+  final TicketModel ticket;
+  const TicketWidget({
+    super.key,
+    required this.ticket,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +34,8 @@ class TicketWidget extends StatelessWidget {
             child: SizedBox(
               height: appHeight * .52,
               width: appWidth * .7,
-              child: Image.asset(
-                "assets/images/sonic.jpg",
+              child: Image.network(
+                ticket.picture,
                 fit: BoxFit.cover,
               ),
             ),
@@ -76,7 +81,7 @@ class TicketWidget extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "April 23",
+                              ticket.date,
                               style: TextStyle(
                                 fontSize: appHeight * .022,
                                 color: Colors.black87,
@@ -102,7 +107,7 @@ class TicketWidget extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "6 p.m",
+                              ticket.time,
                               style: TextStyle(
                                 fontSize: appHeight * .022,
                                 color: Colors.black87,
@@ -131,7 +136,7 @@ class TicketWidget extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "2",
+                              ticket.seatRow.join(','),
                               style: TextStyle(
                                 fontSize: appHeight * .022,
                                 color: Colors.black87,
@@ -157,7 +162,7 @@ class TicketWidget extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "9, 10",
+                              ticket.seatNumber.join(','),
                               style: TextStyle(
                                 fontSize: appHeight * .022,
                                 color: Colors.black87,
